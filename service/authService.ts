@@ -18,7 +18,7 @@ export async function loginService(email: string, password: string) {
 
     if (compare) {
       const token = jwt.sign({ user }, process.env.JWT_SECRET_KEY as string);
-      return token;
+      return {token: token};
     } else {
       return { message: "Incorrect Password", code: 402 };
     }
