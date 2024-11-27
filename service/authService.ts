@@ -30,12 +30,19 @@ export async function loginService(email: string, password: string) {
 
 export async function registerService(user: UserType) {
   try {
+
+    const check = await Users.findOne({ where: { email: user.email } });
+    if (check) {
+        return {message :"User already exists!"}
+    }
+
     const hashpwd = await bcrypt.hash(user.password,saltRounds)
     user.password = hashpwd;
+    user.last_modified = new Date().toISOString();
     const newUser = await Users.create(user);
 
     const token = jwt.sign({ newUser }, process.env.JWT_SECRET_KEY as string);
-    return {token}
+    return {token: token}
   } catch (error) {
     console.error(`Error registering new user ${user.email}`, error);
     return { message: "Something went wrong! Please try again later", code: 500 };
