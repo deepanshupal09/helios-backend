@@ -7,4 +7,5 @@ type UserType = {
     phone: string;
     password: string;
     last_modified: string;
+    provider_name: string;
 }
