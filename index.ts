@@ -5,6 +5,7 @@ import { initializeSocket } from "./socket";
 import { pool, testDatabaseConnection } from "./config/db"; // Updated import for pg setup
 import userRoutes from "./routes/userRoutes";
 import authRoutes from "./routes/authRoutes";
+import dashboardRoutes from "./routes/dashboardRoutes";
 import cron from "node-cron";
 
 
@@ -36,6 +37,7 @@ startServer();
 // Define API routes
 app.use("/api/user/", userRoutes);
 app.use("/api/auth/", authRoutes);
+app.use("/api/dashboard/", dashboardRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running...");
