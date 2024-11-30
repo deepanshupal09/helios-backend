@@ -36,6 +36,7 @@ startServer();
 // Define API routes
 app.use("/api/user/", userRoutes);
 app.use("/api/auth/", authRoutes);
+app.use("/api/solar/", authRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running...");
