@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { fetchUserModel, registerUserModel } from "../models/authModel";
+import { fetchProvidersModel, fetchUserModel, registerUserModel } from "../models/authModel";
 
 const saltRounds = 10;
 
@@ -49,3 +49,13 @@ export async function registerService(newUser: UserType) {
     return { message: "Something went wrong! Please try again later", code: 500 };
   }
 }
+
+export async function fetchProvidersService() {
+  try {
+    const providers = await fetchProvidersModel();
+    return providers;
+  } catch(error) {
+    console.log("Error fetching providers: ", error)
+    return {message: "Something went wrong! Please try again later."}
+  }
+} 

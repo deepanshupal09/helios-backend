@@ -28,3 +28,5 @@ export const registerUserQuery = ` INSERT INTO users (
     password
   ) VALUES ($1, $2, $3, $4, $5, $6, $7)
   RETURNING *;`;
+
+  export const fetchProvidersQuery = "SELECT * FROM providers;";
