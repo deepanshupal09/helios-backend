@@ -1,4 +1,4 @@
-import { fetchGridConsumptionsModel, fetchSolarConsumptionsModel } from '../models/dashboardModel';
+import { fetchActualTariffRatesModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchSolarConsumptionsModel} from '../models/dashboardModel';
 
 export const fetchConsumptionService = async (email: string, currentTimestamp: string): Promise<ConsumptionResult> => {
     try {
@@ -23,4 +23,18 @@ export const fetchConsumptionService = async (email: string, currentTimestamp: s
         throw error;
     }
 };
+
+export const fetchTariffRatesService = async (email:string, currentTimestamp: string): Promise<TariffResult> => {
+    try{
+        const actualTariffData: TariffRates[] = await fetchActualTariffRatesModel(email, currentTimestamp);
+        const forecastTariffData: TariffRates[] = await fetchForeCastTariffRatesModel(email, currentTimestamp);
+        return { actual_tariff: actualTariffData, forecast_tariff: forecastTariffData };
+    }catch(error){
+        console.error('Error fetching tariff data: ', error);
+        throw error;
+    }
+}
+
+
+
 

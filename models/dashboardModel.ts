@@ -1,5 +1,5 @@
 import { pool } from "../config/db";
-import { fetchGridConsumptions, fetchSolarConsumptions } from "./dashboardQuery";
+import { fetchActualTariffRates, fetchForecastTariffRates, fetchGridConsumptions, fetchSolarConsumptions } from "./dashboardQuery";
 
 export const fetchGridConsumptionsModel = async ( email : string, currentTimestamp: string) : Promise<DailyConsumption[]> => {
     try{
@@ -14,6 +14,25 @@ export const fetchGridConsumptionsModel = async ( email : string, currentTimesta
 export const fetchSolarConsumptionsModel = async ( email : string, currentTimestamp: string) : Promise<DailyConsumption[]> => {
     try{
         const result = await pool.query(fetchSolarConsumptions, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+
+export const fetchActualTariffRatesModel = async ( email : string, currentTimestamp: string) : Promise<TariffRates[]> => {
+    try{
+        const result = await pool.query(fetchActualTariffRates, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+export const fetchForeCastTariffRatesModel = async ( email : string, currentTimestamp: string) : Promise<TariffRates[]> => {
+    try{
+        const result = await pool.query(fetchForecastTariffRates, [email, currentTimestamp]);
         return result.rows;
     }catch(error){
         console.error("Error fetching users: ", error);
