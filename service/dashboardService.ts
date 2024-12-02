@@ -1,4 +1,5 @@
-import { fetchActualTariffRatesModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchSolarConsumedUsageModel, fetchSolarConsumptionsModel, fetchSolarProducedUsageModel} from '../models/dashboardModel';
+import { pool } from '../config/db';
+import { fetchActualTariffRatesModel, fetchCurrentGridModel, fetchCurrentSavingsModel, fetchCurrentSolarModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchSolarConsumedUsageModel, fetchSolarConsumptionsModel, fetchSolarProducedUsageModel, fetchSolarSoldModel} from '../models/dashboardModel';
 
 export const fetchConsumptionService = async (email: string, currentTimestamp: string): Promise<ConsumptionResult> => {
     try {
@@ -63,3 +64,41 @@ export const fetchTariffRatesService = async (email:string, currentTimestamp: st
         throw error;
     }
 }
+
+export const fetchCurrentData = async (
+    email: string,
+    currentTimestamp: string
+): Promise<currentResult & { total_savings: number; solar_energy_sold: number | null }> => {
+    try {
+        const currentGrid: SolarType[] = await fetchCurrentGridModel(email, currentTimestamp);
+        const currentSolar: SolarCurrent[] = await fetchCurrentSolarModel(email, currentTimestamp);
+
+        const solarSavingsPromises = currentSolar.map(async (item) => {
+            const savings = await fetchCurrentSavingsModel(item.email, item.timestamp, item.total_power);
+            return {
+                ...item,
+                savings: savings.length > 0 ? savings[0].current_saving : 0,
+            };
+        });
+
+        // Fetch solar energy sold
+        const solarSold = await fetchSolarSoldModel(email, currentTimestamp);
+        const solarEnergySold = solarSold.length > 0 ? solarSold[0].solar_energy_sold : null;
+
+        const solarConsumptionWithSavings = await Promise.all(solarSavingsPromises);
+        const totalSavings = solarConsumptionWithSavings.reduce((acc, item) => acc + item.savings, 0);
+        const currentSolarConsumption = currentSolar.reduce((acc, item) => acc + item.total_power, 0);
+        const currentGridConsumption = currentGrid.reduce((acc, item) => acc + item.total_power, 0);
+
+        return {
+            grid_consumption: currentGridConsumption,
+            solar_consumption: currentSolarConsumption,
+            total_savings: totalSavings,
+            solar_energy_sold: solarEnergySold
+        };
+    } catch (error) {
+        console.error('Error fetching tariff data: ', error);
+        throw error;
+    }
+};
+

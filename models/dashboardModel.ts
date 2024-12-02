@@ -1,5 +1,5 @@
 import { pool } from "../config/db";
-import { fetchActualTariffRates, fetchForecastTariffRates, fetchGridConsumptions, fetchSolarConsumedUsage, fetchSolarConsumptions, fetchSolarProducedUsage } from "./dashboardQuery";
+import { fetchActualTariffRates, fetchCurrentGridConsumption, fetchCurrentSolarConsumption,fetchCurrentSavings, fetchForecastTariffRates, fetchGridConsumptions, fetchSolarConsumedUsage, fetchSolarConsumptions, fetchSolarProducedUsage, fetchSolarSold } from "./dashboardQuery";
 
 export const fetchGridConsumptionsModel = async ( email : string, currentTimestamp: string) : Promise<DailyConsumption[]> => {
     try{
@@ -52,6 +52,46 @@ export const fetchSolarConsumedUsageModel = async ( email : string, currentTimes
 export const fetchSolarProducedUsageModel = async ( email : string, currentTimestamp: string) : Promise<SolarType[]> => {
     try{
         const result = await pool.query(fetchSolarProducedUsage, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+export const fetchCurrentGridModel = async ( email : string, currentTimestamp: string) : Promise<SolarType[]> => {
+    try{
+        const result = await pool.query(fetchCurrentGridConsumption, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+
+export const fetchCurrentSolarModel = async ( email : string, currentTimestamp: string) : Promise<SolarCurrent[]> => {
+    try{
+        const result = await pool.query(fetchCurrentSolarConsumption, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+
+export const fetchCurrentSavingsModel = async ( email: string, currentTimestamp: string, total_power:number) : Promise<any[]> => {
+    try{
+        const result = await pool.query(fetchCurrentSavings, [email, currentTimestamp, total_power]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+
+
+export const fetchSolarSoldModel = async ( email: string, currentTimestamp: string) : Promise<any[]> => {
+    try{
+        const result = await pool.query(fetchSolarSold, [email, currentTimestamp]);
         return result.rows;
     }catch(error){
         console.error("Error fetching users: ", error);

@@ -18,9 +18,20 @@ type SolarType = {
     day_name?: string;
 }
 
+type SolarCurrent = {
+    email:string;
+    timestamp: string;
+    total_power: number;
+}
+
 type SolarResult = {
     solar_consumption: SolarType[];
     solar_production: SolarType[];
+}
+
+type currentResult = {
+    grid_consumption: number;
+    solar_consumption: number;
 }
 
 type TariffRates = {

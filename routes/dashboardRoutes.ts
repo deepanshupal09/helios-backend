@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { fetchConsumptionController, fetchSolarUsageController, fetchTariffRatesController } from "../controllers/dashboardController";
+import { fetchConsumptionController, fetchCurrentDataController, fetchSolarUsageController, fetchTariffRatesController } from "../controllers/dashboardController";
 
 const router = Router();
 
@@ -7,5 +7,6 @@ const router = Router();
 router.get("/fetch-consumption", fetchConsumptionController);
 router.get("/fetch-tariff", fetchTariffRatesController);
 router.get("/fetch-solar", fetchSolarUsageController);
+router.get("/fetch-data", fetchCurrentDataController);
 
 export default router;
