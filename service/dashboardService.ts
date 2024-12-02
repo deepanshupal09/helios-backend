@@ -1,55 +1,40 @@
-import { fetchgGridConsumptionsModel, fetchgSolarConsumptionsModel } from '../models/dashboardModel';
-import { format, parse, differenceInCalendarDays } from 'date-fns';
-
-const calculateDailyConsumption = (data: (GridConsumptionType | SolarConsumptionType)[]): Record<string, DailyConsumption> => {
-    const groupedData: Record<string, DailyConsumption> = {};
-
-    data.forEach(entry => {
-        const entryDate = new Date(entry.timestamp);
-        const day = format(entryDate, 'dd-MM-yyyy (EEEE)');
-
-        if (!groupedData[day]) {
-            groupedData[day] = {
-                total_consumption: 0,
-                submeter_1: 0,
-                submeter_2: 0,
-                submeter_3: 0
-            };
-        }
-
-        groupedData[day].total_consumption += Number(entry.total_power || 0);
-        groupedData[day].submeter_1 += Number(entry.submeter_1 || 0);
-        groupedData[day].submeter_2 += Number(entry.submeter_2 || 0);
-        groupedData[day].submeter_3 += Number(entry.submeter_3 || 0);
-    });
-
-    return groupedData;
-};
+import { fetchActualTariffRatesModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchSolarConsumptionsModel} from '../models/dashboardModel';
 
 export const fetchConsumptionService = async (email: string, currentTimestamp: string): Promise<ConsumptionResult> => {
     try {
-        const parsedCurrentDate = parse(currentTimestamp, 'dd-MM-yyyy HH:mm', new Date());
-        const gridData: GridConsumptionType[] = await fetchgGridConsumptionsModel(email);
-        const solarData: SolarConsumptionType[] = await fetchgSolarConsumptionsModel(email);
+        const gridData: DailyConsumption[] = await fetchGridConsumptionsModel(email, currentTimestamp);
+        const solarData: DailyConsumption[] = await fetchSolarConsumptionsModel(email, currentTimestamp);
 
-        // Filter the data for the last 8 days
-        const filterLastEightDays = (data: (GridConsumptionType | SolarConsumptionType)[]) => {
-            return data.filter(entry => {
-                const entryDate = new Date(entry.timestamp);
-                const daysDiff = differenceInCalendarDays(parsedCurrentDate, entryDate);
-                return daysDiff >= 0 && daysDiff < 8;
-            });
-        };
+        const updatedGridData = gridData.map((item) => {
+            const date = new Date(item.date);
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+            return { ...item, day_name: dayName };
+        });
 
-        const filteredGridData = filterLastEightDays(gridData);
-        const filteredSolarData = filterLastEightDays(solarData);
+        const updatedSolarData = solarData.map((item) => {
+            const date = new Date(item.date);
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+            return { ...item, day_name: dayName };
+        });
 
-        const gridConsumption = calculateDailyConsumption(filteredGridData);
-        const solarConsumption = calculateDailyConsumption(filteredSolarData);
-
-        return { grid_consumption: gridConsumption, solar_consumption: solarConsumption };
+        return { grid_consumption: updatedGridData, solar_consumption: updatedSolarData };
     } catch (error) {
         console.error('Error fetching consumption data: ', error);
         throw error;
     }
 };
+
+export const fetchTariffRatesService = async (email:string, currentTimestamp: string): Promise<TariffResult> => {
+    try{
+        const actualTariffData: TariffRates[] = await fetchActualTariffRatesModel(email, currentTimestamp);
+        const forecastTariffData: TariffRates[] = await fetchForeCastTariffRatesModel(email, currentTimestamp);
+        return { actual_tariff: actualTariffData, forecast_tariff: forecastTariffData };
+    }catch(error){
+        console.error('Error fetching tariff data: ', error);
+        throw error;
+    }
+}
+
+
+
+

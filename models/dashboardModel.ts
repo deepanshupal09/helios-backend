@@ -1,9 +1,9 @@
 import { pool } from "../config/db";
-import { fetchGridConsumptions, fetchSolarConsumptions } from "./dashboardQuery";
+import { fetchActualTariffRates, fetchForecastTariffRates, fetchGridConsumptions, fetchSolarConsumptions } from "./dashboardQuery";
 
-export const fetchgGridConsumptionsModel = async ( email : string) : Promise<GridConsumptionType[]> => {
+export const fetchGridConsumptionsModel = async ( email : string, currentTimestamp: string) : Promise<DailyConsumption[]> => {
     try{
-        const result = await pool.query(fetchGridConsumptions, [email]);
+        const result = await pool.query(fetchGridConsumptions, [email, currentTimestamp]);
         return result.rows;
     }catch(error){
         console.error("Error fetching users: ", error);
@@ -11,9 +11,28 @@ export const fetchgGridConsumptionsModel = async ( email : string) : Promise<Gri
     }
 }
 
-export const fetchgSolarConsumptionsModel = async ( email : string) : Promise<SolarConsumptionType[]> => {
+export const fetchSolarConsumptionsModel = async ( email : string, currentTimestamp: string) : Promise<DailyConsumption[]> => {
     try{
-        const result = await pool.query(fetchSolarConsumptions, [email]);
+        const result = await pool.query(fetchSolarConsumptions, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+
+export const fetchActualTariffRatesModel = async ( email : string, currentTimestamp: string) : Promise<TariffRates[]> => {
+    try{
+        const result = await pool.query(fetchActualTariffRates, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+export const fetchForeCastTariffRatesModel = async ( email : string, currentTimestamp: string) : Promise<TariffRates[]> => {
+    try{
+        const result = await pool.query(fetchForecastTariffRates, [email, currentTimestamp]);
         return result.rows;
     }catch(error){
         console.error("Error fetching users: ", error);
