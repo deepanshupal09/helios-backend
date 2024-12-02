@@ -1,5 +1,5 @@
 import { pool } from "../config/db";
-import { fetchSolarIrradiationQuery, fetchSolarIrradiationWeekQuery, fetchSolarProductionQuery, fetchSolarProductionWeekQuery } from "./solarQuery";
+import { fetchEnergyYieldQuery, fetchSolarIrradiationQuery, fetchSolarIrradiationWeekQuery, fetchSolarProductionQuery, fetchSolarProductionWeekQuery, putTransactionQuery, updateStatusQuery } from "./solarQuery";
 
 export const fetchSolarProductionModel = async (email: string, date: Date) => {
   try {
@@ -39,3 +39,32 @@ export const fetchSolarIrradianceWeekModel = async (date: Date) => {
     throw error;
   }
 };
+
+export const putTransactionModel = async (transaction: TransactionType) => {
+  try {
+    await pool.query(putTransactionQuery, [transaction.total_power_sold, transaction.timestamp, transaction.transaction_id, transaction.email])
+    return {message: "Transaction inserted successfully"}
+  } catch(error) {
+    console.error("Error putting transaction, ", error);
+    throw error;
+  }
+} 
+
+export const fetchSolarYieldModel = async (date: Date, email: string) => {
+  try {
+    const result = await pool.query(fetchEnergyYieldQuery, [date, email]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching solar yield: ", error)
+    throw error;
+  }
+}
+export const updateStatusModel = async (status: string, email: string) => {
+  try {
+    const result = await pool.query(updateStatusQuery, [status, email]);
+    return {message: "Status updated successfully!"};
+  } catch (error) {
+    console.error("Error updating status: ", error)
+    throw error;
+  }
+}

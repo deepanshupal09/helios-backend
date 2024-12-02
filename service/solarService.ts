@@ -3,8 +3,12 @@ import {
   fetchSolarIrradianceWeekModel,
   fetchSolarProductionModel,
   fetchSolarProductionWeekModel,
+  fetchSolarYieldModel,
+  putTransactionModel,
+  updateStatusModel,
 } from "../models/solarModel";
 import dotenv from "dotenv";
+import { v4 as uuidv4 } from "uuid";
 
 dotenv.config();
 
@@ -20,7 +24,7 @@ export async function fetchSolarProductionService(email: string, date: Date, typ
       );
       const weatherData = await res.json();
 
-      // console.log("solar Data: ", solarIrradianceData);
+      console.log("solar Data: ", solarIrradianceData);
       // console.log("weather Data: ", weatherData);
 
       // Get the closest hourly weather forecast
@@ -62,7 +66,7 @@ export async function fetchSolarProductionService(email: string, date: Date, typ
         ];
       });
 
-      // console.log("transformed data: ", transformedData);
+      console.log("transformed data: ", transformedData);
       const apiCalls = transformedData.map((data) =>
         fetch(`${process.env.MODEL_API_URL}/predict`, {
           method: "POST",
@@ -82,6 +86,7 @@ export async function fetchSolarProductionService(email: string, date: Date, typ
         if (result.prediction < 67) result.prediction = 0;
         else if (result.prediction > 600) result.prediction /= 4;
       });
+      console.log("result: ", results)
       for (let i = 0; i < 3; i++) {
         solarData.push({ timestamp: solarIrradianceData[i].timestamp, total_power: results[i].prediction });
       }
@@ -169,12 +174,12 @@ export async function fetchSolarProductionService(email: string, date: Date, typ
       const aggregateData = aggregateDailyPower(solarData);
       aggregateData.map((data) => {
         if (data.total_power > 4000) data.total_power /= 6;
-      })
+      });
       // console.log("Aggregating: ", aggregateData);
 
       return aggregateData;
     } else {
-      return {message: "Invalid argument"}
+      return { message: "Invalid argument" };
     }
   } catch (error) {
     console.log("Error fetching Solar Production: ", error);
@@ -200,7 +205,6 @@ function aggregateDailyPower(data: { timestamp: Date; total_power: number }[]) {
   }));
 }
 
-
 // Helper function to find the closest weather data
 function getClosestWeatherData(forecast: any[], targetDate: Date) {
   let closest = forecast[0];
@@ -217,4 +221,49 @@ function getClosestWeatherData(forecast: any[], targetDate: Date) {
   });
 
   return closest;
+}
+
+export async function sellSolarEnergyService(power: number, email: string) {
+  try {
+    const date = new Date();
+    let transaction: TransactionType = {
+      email: email,
+      total_power_sold: power,
+      transaction_id: uuidv4(),
+      timestamp: date,
+    };
+    await putTransactionModel(transaction);
+    return {message: `${power}kWhr Solar Energy Sold Successfully`}
+  } catch (error) {
+    console.log("Error selling solar energy ", error);
+    throw new Error("Something went wrong! Please try again later.");
+  }
+}
+
+
+export async function fetchSolarYieldService (date: Date, email: string) {
+  try {
+    const res = await fetchSolarYieldModel(date, email);
+    const adjustedData = res.map((item: { day: string; energy_sold: number; energy_consumed: number }) => {
+      const adjustedDay = new Date(new Date(item.day).getTime() + 5 * 60 * 60 * 1000 + 30 * 60 * 1000);
+      return {
+        ...item,
+        day: adjustedDay.toISOString(), // Convert back to ISO string
+      };
+    });
+    return adjustedData;
+  } catch(error) {
+    console.log("Error fetching solar yield", error);
+    throw new Error("Something went wrong! Please try again later.");
+  }
+}
+
+export async function updateStatusService (status: string, email: string) {
+  try {
+    const res = await updateStatusModel(status, email);
+    return res;
+  } catch(error) {
+    console.log("Error updating status: ", error);
+    throw new Error("Something went wrong! Please try again later.");
+  }
 }
