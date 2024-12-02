@@ -1,13 +1,21 @@
 import { pool } from "../config/db";
+import { fetchSolarIrradiationQuery, fetchSolarProductionQuery } from "./solarQuery";
 
-
-export const fetchProvidersModel = async () => {
-    try {
-    //   const result = await pool.query(fetchProvidersQuery);
-    //   return result.rows; // Ensure the function returns a value
-    } catch (error) {
-      console.error("Error fetching users: ", error);
-      throw error; // Rethrow the error for higher-level handling
-    }
-  };
-  
+export const fetchSolarProductionModel = async (email: string, date: Date) => {
+  try {
+    const result = await pool.query(fetchSolarProductionQuery, [email, date]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching solar production: ", error);
+    throw error;
+  }
+};
+export const fetchSolarIrradianceModel = async (date: Date) => {
+  try {
+    const result = await pool.query(fetchSolarIrradiationQuery, [date]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error fetching solar production: ", error);
+    throw error;
+  }
+};

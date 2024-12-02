@@ -6,6 +6,7 @@ import { pool, testDatabaseConnection } from "./config/db"; // Updated import fo
 import userRoutes from "./routes/userRoutes";
 import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
+import solarRoutes from "./routes/solarRoutes"
 import cron from "node-cron";
 
 
@@ -38,39 +39,39 @@ startServer();
 app.use("/api/user/", userRoutes);
 app.use("/api/auth/", authRoutes);
 app.use("/api/dashboard/", dashboardRoutes);
-app.use("/api/solar/", authRoutes);
+app.use("/api/solar/", solarRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running...");
 });
 
-const fetchAndPopulateConsumption = async ():Promise<any> => {
+// const fetchAndPopulateConsumption = async ():Promise<any> => {
 
-}
+// }
 
-const fetchAndPopulateSolarData = async ():Promise<any> => {
+// const fetchAndPopulateSolarData = async ():Promise<any> => {
 
-}
+// }
 
-const fetchAndPopulateTariffData = async ():Promise<any> => {
+// const fetchAndPopulateTariffData = async ():Promise<any> => {
 
-}
+// }
 
-cron.schedule("0 * * * *", async () => {
-  console.log("Cron job started at:", new Date().toISOString());
-  try {
-    // do the task
+// cron.schedule("0 * * * *", async () => {
+//   console.log("Cron job started at:", new Date().toISOString());
+//   try {
+//     // do the task
 
-    await Promise.all([
-      fetchAndPopulateConsumption(),
-      fetchAndPopulateSolarData(),
-      fetchAndPopulateTariffData()
-    ])
-    console.log("All data updated ssuccessffuullyy!");
-  } catch (error) {
-    console.error("Error during cron job execution:", error);
-  }
-});
+//     await Promise.all([
+//       fetchAndPopulateConsumption(),
+//       fetchAndPopulateSolarData(),
+//       fetchAndPopulateTariffData()
+//     ])
+//     console.log("All data updated ssuccessffuullyy!");
+//   } catch (error) {
+//     console.error("Error during cron job execution:", error);
+//   }
+// });
 
 // Graceful shutdown
 process.on("SIGINT", async () => {
