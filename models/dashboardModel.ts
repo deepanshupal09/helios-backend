@@ -1,5 +1,5 @@
 import { pool } from "../config/db";
-import { fetchActualTariffRates, fetchForecastTariffRates, fetchGridConsumptions, fetchSolarConsumptions } from "./dashboardQuery";
+import { fetchActualTariffRates, fetchForecastTariffRates, fetchGridConsumptions, fetchSolarConsumedUsage, fetchSolarConsumptions, fetchSolarProducedUsage } from "./dashboardQuery";
 
 export const fetchGridConsumptionsModel = async ( email : string, currentTimestamp: string) : Promise<DailyConsumption[]> => {
     try{
@@ -33,6 +33,25 @@ export const fetchActualTariffRatesModel = async ( email : string, currentTimest
 export const fetchForeCastTariffRatesModel = async ( email : string, currentTimestamp: string) : Promise<TariffRates[]> => {
     try{
         const result = await pool.query(fetchForecastTariffRates, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+
+export const fetchSolarConsumedUsageModel = async ( email : string, currentTimestamp: string) : Promise<SolarType[]> => {
+    try{
+        const result = await pool.query(fetchSolarConsumedUsage, [email, currentTimestamp]);
+        return result.rows;
+    }catch(error){
+        console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+export const fetchSolarProducedUsageModel = async ( email : string, currentTimestamp: string) : Promise<SolarType[]> => {
+    try{
+        const result = await pool.query(fetchSolarProducedUsage, [email, currentTimestamp]);
         return result.rows;
     }catch(error){
         console.error("Error fetching users: ", error);

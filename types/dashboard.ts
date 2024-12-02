@@ -12,6 +12,17 @@ type ConsumptionResult = {
     solar_consumption: DailyConsumption[];
 };
 
+type SolarType = {
+    date: string;
+    total_power: number;
+    day_name?: string;
+}
+
+type SolarResult = {
+    solar_consumption: SolarType[];
+    solar_production: SolarType[];
+}
+
 type TariffRates = {
     timestamp: string;
     rate: number;
