@@ -4,20 +4,29 @@ export const fetchGridConsumptions = `
     JOIN provider_tariff AS pt
     ON cp.tariff_id = pt.tariff_id
     WHERE cp.email = $1
-    AND DATE(pt.timestamp) <= $2 
-    AND DATE(pt.timestamp) >= $2 - INTERVAL '7 days'
+    AND DATE(pt.timestamp) <= DATE($2) 
+    AND DATE(pt.timestamp) >= (DATE($2) - INTERVAL '7 days')
     GROUP BY DATE(pt.timestamp)
     ORDER BY date;
 `;
 
 export const fetchSolarConsumptions = `
-    SELECT DATE(cs.timestamp) AS date, SUM(cs.total_power) AS total_power, SUM(cs.submeter_1) AS submeter_1, SUM(cs.submeter_2) AS submeter_2, SUM(cs.submeter_3) AS submeter_3
-    FROM consumption_solar AS cs
-    WHERE cs.email = $1
-    AND DATE(cs.timestamp) <= $2 
-    AND DATE(cs.timestamp) >= $2 - INTERVAL '7 days'
-    GROUP BY DATE(cs.timestamp)
-    ORDER BY date;
+    SELECT 
+    DATE(cs.timestamp) AS date, 
+    SUM(cs.total_power) AS total_power, 
+    SUM(cs.submeter_1) AS submeter_1, 
+    SUM(cs.submeter_2) AS submeter_2, 
+    SUM(cs.submeter_3) AS submeter_3
+    FROM 
+        consumption_solar AS cs
+    WHERE 
+        cs.email = $1
+        AND DATE(cs.timestamp) <= DATE($2)
+        AND DATE(cs.timestamp) >= (DATE($2) - INTERVAL '7 days')
+    GROUP BY 
+        DATE(cs.timestamp)
+    ORDER BY 
+        date;
 `;
 
 export const fetchForecastTariffRates = `
@@ -92,3 +101,66 @@ export const fetchActualTariffRates = `
     FROM 
         actual_data
 `;
+
+export const fetchSolarConsumedUsage = `
+    SELECT 
+    DATE(cs.timestamp) AS date, 
+    SUM(cs.total_power) AS total_power 
+    FROM 
+        consumption_solar AS cs
+    WHERE 
+        cs.email = $1
+        AND DATE(cs.timestamp) <= DATE($2)
+        AND DATE(cs.timestamp) >= (DATE($2) - INTERVAL '10 days')
+    GROUP BY 
+        DATE(cs.timestamp)
+    ORDER BY 
+        date;
+`;
+
+export const fetchSolarProducedUsage = `
+    SELECT 
+    DATE(cs.timestamp) AS date, 
+    SUM(cs.total_power) AS total_power
+    FROM 
+        solar_generated AS cs
+    WHERE 
+        cs.email = $1
+        AND DATE(cs.timestamp) <= DATE($2)
+        AND DATE(cs.timestamp) >= (DATE($2) - INTERVAL '10 days')
+    GROUP BY 
+        DATE(cs.timestamp)
+    ORDER BY 
+        date;
+`;
+
+export const fetchCurrentGridConsumption = `
+    SELECT DATE(pt.timestamp) AS date, SUM(cp.total_power) AS total_power
+    FROM consumption_provider AS cp
+    JOIN provider_tariff AS pt
+    ON cp.tariff_id = pt.tariff_id
+    WHERE cp.email = $1
+    AND DATE(pt.timestamp) = DATE($2) 
+    GROUP BY DATE(pt.timestamp)
+    ORDER BY date;
+`;
+
+export const fetchCurrentSolarConsumptions = `
+    SELECT 
+    DATE(cs.timestamp) AS date, 
+    SUM(cs.total_power) AS total_power, 
+    FROM 
+        consumption_solar AS cs
+    WHERE 
+        cs.email = $1
+        AND DATE(cs.timestamp) = DATE($2)
+    GROUP BY 
+        DATE(cs.timestamp)
+    ORDER BY 
+        date;
+`;
+
+// export const fetchCurrentSavings = `
+
+// `;
+
