@@ -1,5 +1,5 @@
 import { pool } from '../config/db';
-import { fetchActualTariffRatesModel, fetchCurrentGridModel, fetchCurrentSavingsModel, fetchCurrentSolarModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchSolarConsumedUsageModel, fetchSolarConsumptionsModel, fetchSolarProducedUsageModel, fetchSolarSoldModel} from '../models/dashboardModel';
+import { fetchActualTariffRatesModel, fetchCurrentGridModel, fetchCurrentSavingsModel, fetchCurrentSolarModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchLinkedDeviceConsumptionModel, fetchSolarConsumedUsageModel, fetchSolarConsumptionsModel, fetchSolarProducedUsageModel, fetchSolarSoldModel} from '../models/dashboardModel';
 
 export const fetchConsumptionService = async (email: string, currentTimestamp: string): Promise<ConsumptionResult> => {
     try {
@@ -102,3 +102,13 @@ export const fetchCurrentData = async (
     }
 };
 
+
+export async function fetchLinkedDeviceConsumptionService (date: Date, email: string) {
+    try {
+      const res = await fetchLinkedDeviceConsumptionModel(date, email);
+      return res;
+    } catch(error) {
+      console.log("Error fetching linked Device Consumption: ", error);
+      throw new Error("Something went wrong! Please try again later.");
+    }
+  }

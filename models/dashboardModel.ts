@@ -1,5 +1,5 @@
 import { pool } from "../config/db";
-import { fetchActualTariffRates, fetchCurrentGridConsumption, fetchCurrentSolarConsumption,fetchCurrentSavings, fetchForecastTariffRates, fetchGridConsumptions, fetchSolarConsumedUsage, fetchSolarConsumptions, fetchSolarProducedUsage, fetchSolarSold } from "./dashboardQuery";
+import { fetchActualTariffRates, fetchCurrentGridConsumption, fetchCurrentSolarConsumption,fetchCurrentSavings, fetchForecastTariffRates, fetchGridConsumptions, fetchLinkedDeviceConsumptionQuery, fetchSolarConsumedUsage, fetchSolarConsumptions, fetchSolarProducedUsage, fetchSolarSold } from "./dashboardQuery";
 
 export const fetchGridConsumptionsModel = async ( email : string, currentTimestamp: string) : Promise<DailyConsumption[]> => {
     try{
@@ -55,6 +55,17 @@ export const fetchSolarProducedUsageModel = async ( email : string, currentTimes
         return result.rows;
     }catch(error){
         console.error("Error fetching users: ", error);
+        throw error;
+    }
+}
+
+export const fetchLinkedDeviceConsumptionModel = async ( date: Date, email: string) => {
+    try {
+        console.log("date: ", date)
+        const result = await pool.query(fetchLinkedDeviceConsumptionQuery, [date, email]);
+        return result.rows;
+    } catch(error) {
+        console.error("Error fetching linked devices consumption: ", error);
         throw error;
     }
 }

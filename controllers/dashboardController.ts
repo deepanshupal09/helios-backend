@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchConsumptionService, fetchCurrentData, fetchSolarUsageService, fetchTariffRatesService } from "../service/dashboardService";
+import { fetchConsumptionService, fetchCurrentData, fetchLinkedDeviceConsumptionService, fetchSolarUsageService, fetchTariffRatesService } from "../service/dashboardService";
 
 export const fetchConsumptionController = async (req: Request, res: Response) => {
     try {
@@ -54,5 +54,19 @@ export const fetchCurrentDataController = async (req: Request, res: Response) =>
         res.status(200).json(currentData);
     } catch (error: any) {
         res.status(error.code).send({ message: error.message });
+    }
+};
+
+export const fetchLinkedDeviceConsumption = async (req: Request, res: Response) => {
+    try {
+        const email = req.headers.email as string;
+        const date = req.headers.date as string;
+        if (!email || !date) {
+            res.status(400).json({ message: "Email and date are required." });
+        }
+        const linkedDeviceConsumption = await fetchLinkedDeviceConsumptionService(new Date(date), email);
+        res.status(200).json(linkedDeviceConsumption);
+    } catch (error: any) {
+        res.status(error.code).send({ message: error.message || "Something went wrong! Please try again later." });
     }
 };

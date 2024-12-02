@@ -161,6 +161,57 @@ export const fetchCurrentSolarConsumption = `
         cs.timestamp;
 `;
 
+export const fetchLinkedDeviceConsumptionQuery = `
+WITH provider_data AS (
+    SELECT 
+        cp.email,
+        pt."timestamp" AS provider_timestamp,
+        COALESCE(cp.submeter_1, 0) AS submeter_1,
+        COALESCE(cp.submeter_2, 0) AS submeter_2,
+        COALESCE(cp.submeter_3, 0) AS submeter_3
+    FROM 
+        public.consumption_provider cp
+    JOIN 
+        public.provider_tariff pt
+        ON cp.tariff_id = pt.tariff_id
+    WHERE 
+        pt."timestamp" >= $1::date
+        AND pt."timestamp" < $1::date + INTERVAL '1 day'
+        AND cp.email = $2
+),
+solar_data AS (
+    SELECT 
+        cs.email,
+        cs."timestamp" AS solar_timestamp,
+        COALESCE(cs.submeter_1, 0) AS submeter_1,
+        COALESCE(cs.submeter_2, 0) AS submeter_2,
+        COALESCE(cs.submeter_3, 0) AS submeter_3
+    FROM 
+        public.consumption_solar cs
+    WHERE 
+        cs."timestamp" >= $1::date
+        AND cs."timestamp" < $1::date + INTERVAL '1 day'
+        AND cs.email = $2
+)
+SELECT 
+    COALESCE(pd.email, sd.email) AS email,
+    SUM(COALESCE(pd.submeter_1, 0) + COALESCE(sd.submeter_1, 0)) AS total_submeter_1,
+    SUM(COALESCE(pd.submeter_2, 0) + COALESCE(sd.submeter_2, 0)) AS total_submeter_2,
+    SUM(COALESCE(pd.submeter_3, 0) + COALESCE(sd.submeter_3, 0)) AS total_submeter_3
+FROM 
+    provider_data pd
+FULL JOIN 
+    solar_data sd 
+    ON pd.email = sd.email 
+    AND pd.provider_timestamp = sd.solar_timestamp
+WHERE 
+    COALESCE(pd.email, sd.email) = $2
+GROUP BY 
+    COALESCE(pd.email, sd.email);
+`
+
+
+
 
 export const fetchCurrentSavings = `
     SELECT pt.rate * $3 AS current_saving, pt.rate AS rate
