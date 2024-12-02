@@ -1,4 +1,4 @@
-import { fetchActualTariffRatesModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchSolarConsumedUsageModel, fetchSolarConsumptionsModel, fetchSolarProducedUsageModel} from '../models/dashboardModel';
+import { fetchActualTariffRatesModel, fetchForeCastTariffRatesModel, fetchGridConsumptionsModel, fetchLinkedDeviceConsumptionModel, fetchSolarConsumedUsageModel, fetchSolarConsumptionsModel, fetchSolarProducedUsageModel} from '../models/dashboardModel';
 
 export const fetchConsumptionService = async (email: string, currentTimestamp: string): Promise<ConsumptionResult> => {
     try {
@@ -63,3 +63,13 @@ export const fetchTariffRatesService = async (email:string, currentTimestamp: st
         throw error;
     }
 }
+
+export async function fetchLinkedDeviceConsumptionService (date: Date, email: string) {
+    try {
+      const res = await fetchLinkedDeviceConsumptionModel(date, email);
+      return res;
+    } catch(error) {
+      console.log("Error fetching linked Device Consumption: ", error);
+      throw new Error("Something went wrong! Please try again later.");
+    }
+  }
