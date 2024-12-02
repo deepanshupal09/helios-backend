@@ -145,19 +145,20 @@ export const fetchCurrentGridConsumption = `
     ORDER BY date;
 `;
 
-export const fetchCurrentSolarConsumptions = `
+export const fetchCurrentSolarConsumption = `
     SELECT 
-    DATE(cs.timestamp) AS date, 
-    SUM(cs.total_power) AS total_power, 
+    cs.email AS email,
+    cs.timestamp AS timestamp,
+    cs.total_power AS total_power
     FROM 
         consumption_solar AS cs
     WHERE 
         cs.email = $1
         AND DATE(cs.timestamp) = DATE($2)
     GROUP BY 
-        DATE(cs.timestamp)
+        cs.email, cs.timestamp, cs.total_power
     ORDER BY 
-        date;
+        cs.timestamp;
 `;
 
 export const fetchLinkedDeviceConsumptionQuery = `
@@ -211,7 +212,24 @@ GROUP BY
 
 
 
-// export const fetchCurrentSavings = `
 
-// `;
+export const fetchCurrentSavings = `
+    SELECT pt.rate * $3 AS current_saving, pt.rate AS rate
+    FROM 
+        provider_tariff AS pt
+    JOIN users AS u ON u.provider_id = pt.provider_id 
+    WHERE 
+        pt.timestamp = $2 AND u.email = $1;
+`;
+
+export const fetchSolarSold = `
+    SELECT SUM(pt.total_power_sold) AS solar_energy_sold
+    FROM 
+        transaction AS pt
+    WHERE 
+        DATE(pt.timestamp) = DATE($2)
+        AND pt.email = $1;
+`;
+
+
 
