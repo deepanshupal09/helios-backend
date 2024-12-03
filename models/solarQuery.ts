@@ -1,7 +1,7 @@
 export const fetchSolarProductionQuery = `SELECT timestamp, total_power
 FROM public.solar_generated 
 WHERE email = $1
-AND "timestamp" >= ($2::timestamp - INTERVAL '24 hours')
+AND "timestamp" >= ($2::timestamp - INTERVAL '12 hours')
 AND "timestamp" <= $2::timestamp
 ORDER BY "timestamp" ASC;
 `
