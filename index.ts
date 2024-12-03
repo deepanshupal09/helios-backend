@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import solarRoutes from "./routes/solarRoutes"
 import cron from "node-cron";
+import linkedDevicesRoutes from "./routes/linkedDevicesRoutes";
 
 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/user/", userRoutes);
 app.use("/api/auth/", authRoutes);
 app.use("/api/dashboard/", dashboardRoutes);
 app.use("/api/solar/", solarRoutes);
+app.use("/api/linkedDevices/", linkedDevicesRoutes); 
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running...");
