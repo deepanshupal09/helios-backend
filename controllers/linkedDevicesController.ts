@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchConsumptionDataService } from "../service/linkedDevicesService";
+import { fetchConsumptionDataService, fetchNotificationService } from "../service/linkedDevicesService";
 
 
 export const fetchConsumtionDataController = async (req: Request, res: Response) => {
@@ -15,3 +15,12 @@ export const fetchConsumtionDataController = async (req: Request, res: Response)
         res.status(error.code).send({ message: error.message });
     }
 };
+
+export const fetchNotificationController = async (req: Request, res: Response) => {
+    try{
+        const result = await fetchNotificationService();
+        res.status(200).json(result);
+    }catch (error: any){
+        res.status(error.code).send({ message: error.message });
+    }
+}
