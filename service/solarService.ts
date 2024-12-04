@@ -1,10 +1,13 @@
 import {
+  fetchBatteryModel,
   fetchSolarIrradianceModel,
   fetchSolarIrradianceWeekModel,
   fetchSolarProductionModel,
   fetchSolarProductionWeekModel,
   fetchSolarYieldModel,
+  fetchStatusModel,
   putTransactionModel,
+  updateBatteryModel,
   updateStatusModel,
 } from "../models/solarModel";
 import dotenv from "dotenv";
@@ -86,8 +89,8 @@ export async function fetchSolarProductionService(email: string, date: Date, typ
         if (result.prediction < 67) result.prediction = 0;
         else if (result.prediction > 600) result.prediction /= 4;
       });
-      console.log("result: ", results)
-      for (let i = 0; i < 3; i++) {
+      console.log("result: ", results);
+      for (let i = 0; i < solarIrradianceData.length; i++) {
         solarData.push({ timestamp: solarIrradianceData[i].timestamp, total_power: results[i].prediction });
       }
 
@@ -166,7 +169,7 @@ export async function fetchSolarProductionService(email: string, date: Date, typ
         if (result.prediction < 67) result.prediction = 0;
       });
 
-      for (let i = 0; i < 46; i++) {
+      for (let i = 0; i < solarIrradianceData.length; i++) {
         solarData.push({ timestamp: solarIrradianceData[i].timestamp, total_power: results[i].prediction });
       }
 
@@ -233,15 +236,14 @@ export async function sellSolarEnergyService(power: number, email: string) {
       timestamp: date,
     };
     await putTransactionModel(transaction);
-    return {message: `${power}kWhr Solar Energy Sold Successfully`}
+    return { message: `${power}kWhr Solar Energy Sold Successfully` };
   } catch (error) {
     console.log("Error selling solar energy ", error);
     throw new Error("Something went wrong! Please try again later.");
   }
 }
 
-
-export async function fetchSolarYieldService (date: Date, email: string) {
+export async function fetchSolarYieldService(date: Date, email: string) {
   try {
     const res = await fetchSolarYieldModel(date, email);
     const adjustedData = res.map((item: { day: string; energy_sold: number; energy_consumed: number }) => {
@@ -252,18 +254,45 @@ export async function fetchSolarYieldService (date: Date, email: string) {
       };
     });
     return adjustedData;
-  } catch(error) {
+  } catch (error) {
     console.log("Error fetching solar yield", error);
     throw new Error("Something went wrong! Please try again later.");
   }
 }
 
-export async function updateStatusService (status: string, email: string) {
+export async function updateStatusService(status: string, email: string) {
   try {
     const res = await updateStatusModel(status, email);
     return res;
-  } catch(error) {
+  } catch (error) {
     console.log("Error updating status: ", error);
+    throw new Error("Something went wrong! Please try again later.");
+  }
+}
+export async function updateBatteryService(battery: number, email: string) {
+  try {
+    const res = await updateBatteryModel(battery, email);
+    return res;
+  } catch (error) {
+    console.log("Error updating battery: ", error);
+    throw new Error("Something went wrong! Please try again later.");
+  }
+}
+export async function fetchStatusService(email: string) {
+  try {
+    const res = await fetchStatusModel(email);
+    return res;
+  } catch (error) {
+    console.log("Error fetching status: ", error);
+    throw new Error("Something went wrong! Please try again later.");
+  }
+}
+export async function fetchBatteryService(email: string) {
+  try {
+    const res = await fetchBatteryModel(email);
+    return res;
+  } catch (error) {
+    console.log("Error fetching battery: ", error);
     throw new Error("Something went wrong! Please try again later.");
   }
 }
