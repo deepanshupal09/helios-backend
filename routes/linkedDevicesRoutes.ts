@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { fetchConsumtionDataController, fetchNotificationController } from "../controllers/linkedDevicesController";
+import { fetchConsumtionDataController, sendNotification } from "../controllers/linkedDevicesController";
 
 const router = Router();
 
 router.get("/fetch-consumption", fetchConsumtionDataController)
-router.get("/fetch-notification", fetchNotificationController)
+router.post("/send-notification", sendNotification)
 
 
 export default router;

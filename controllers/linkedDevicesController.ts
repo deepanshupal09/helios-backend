@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchConsumptionDataService, fetchNotificationService } from "../service/linkedDevicesService";
+import { fetchConsumptionDataService, sendNotificationService } from "../service/linkedDevicesService";
 
 
 export const fetchConsumtionDataController = async (req: Request, res: Response) => {
@@ -16,9 +16,11 @@ export const fetchConsumtionDataController = async (req: Request, res: Response)
     }
 };
 
-export const fetchNotificationController = async (req: Request, res: Response) => {
+export const sendNotification = async (req: Request, res: Response) => {
     try{
-        const result = await fetchNotificationService();
+        const head = req.body.head as string;
+        const verdict = req.body.verdict as string;
+        const result = await sendNotificationService(head, verdict);
         res.status(200).json(result);
     }catch (error: any){
         res.status(error.code).send({ message: error.message });

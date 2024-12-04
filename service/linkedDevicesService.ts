@@ -1,5 +1,8 @@
 import { fetchActualConsumptionModel, fetchForeCastConsumptionModel } from "../models/linkedDevicesModel";
 import { getIO } from "../socket";
+import dotenv from "dotenv"
+
+dotenv.config();
 
 export const fetchConsumptionDataService = async (email:string, currentTimestamp: string): Promise<ConsumptionData> => {
     try{
@@ -13,12 +16,12 @@ export const fetchConsumptionDataService = async (email:string, currentTimestamp
 }
 
 
-export const fetchNotificationService = async() => {
+export const sendNotificationService = async(head: string, verdict: string) => {
     try{
         const io = getIO();
-        io.to("capibara").emit("notification", {
-            head:"What! A potential hike in Tariff rate??",
-            verdict:"Switch to Solar Energy"
+        io.to(process.env.ROOM_CODE||"capibara").emit("notification", {
+            title:head,
+            subTitle:verdict
         });
         return {
             verdict:"Notification sent!"
