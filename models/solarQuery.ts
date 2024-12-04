@@ -79,3 +79,8 @@ ORDER BY
 
 export const updateStatusQuery = `UPDATE users SET status = $1 WHERE email = $2;`
 
+export const updateBatteryQuery = `UPDATE users SET battery = $1 WHERE email = $2;`
+
+export const fetchStatusQuery = `SELECT status from users WHERE email = $1`
+
+export const fetchBatteryQuery = `SELECT battery from users WHERE email = $1`

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchSolarProductionService, fetchSolarYieldService, sellSolarEnergyService, updateStatusService } from "../service/solarService";
+import { fetchBatteryService, fetchSolarProductionService, fetchSolarYieldService, fetchStatusService, sellSolarEnergyService, updateBatteryService, updateStatusService } from "../service/solarService";
 
 export const fetchSolarProduction = async (req: Request, res: Response) => {
   const email = req.headers.email as string;
@@ -39,6 +39,34 @@ export const updateStatus = async (req: Request, res: Response) => {
   const status = req.body.status as string;
   try {
     const result = await updateStatusService(status, email)
+    res.status(200).send(result);
+  } catch (error: any) {
+    res.status(500).send({ message: error.message || "Something went wrong! Please try again later." });
+  }
+};
+export const updateBattery = async (req: Request, res: Response) => {
+  const email = req.body.email as string;
+  const battery = req.body.battery as number;
+  try {
+    const result = await updateBatteryService(battery, email)
+    res.status(200).send(result);
+  } catch (error: any) {
+    res.status(500).send({ message: error.message || "Something went wrong! Please try again later." });
+  }
+};
+export const fetchStatus = async (req: Request, res: Response) => {
+  const email = req.headers.email as string;
+  try {
+    const result = await fetchStatusService(email)
+    res.status(200).send(result);
+  } catch (error: any) {
+    res.status(500).send({ message: error.message || "Something went wrong! Please try again later." });
+  }
+};
+export const fetchBattery = async (req: Request, res: Response) => {
+  const email = req.headers.email as string;
+  try {
+    const result = await fetchBatteryService(email)
     res.status(200).send(result);
   } catch (error: any) {
     res.status(500).send({ message: error.message || "Something went wrong! Please try again later." });
